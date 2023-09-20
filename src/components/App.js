@@ -7,6 +7,9 @@ import Error from './Error';
 import { Main } from './Main';
 import StartScreen from './StartScreen';
 import { Question } from './Question';
+import NextButton from './NextButton';
+import Progress from './Progress';
+import FinishedScreen from './FinishedScreen';
 
 const initialState   = {
     questions: [],
@@ -15,6 +18,7 @@ const initialState   = {
     index: 0,
     answer: null,
     points: 0,
+    highScore:0,
 }
 const reducer = (state,action)=>{
     switch(action.type){
@@ -41,15 +45,30 @@ const reducer = (state,action)=>{
                 points: action.payload === question.correctOption ? state.points + question.points : state.points,
             
             }
+        case 'nextQuestion':
+            return{
+                ...state,
+                index: state.index+1,
+                answer: null,
+            }
+            case 'finish':
+                return{
+                    ...state,
+                    status: 'finished',
+                    highScore: state.points > state.highScore ? state.points : state.highScore,
+                }
+
+            
        default:  throw new Error('Unknown action')
     }
 
 }
 
 export default function App() {
-    const [{questions, status, index, answer}, dispatch] = useReducer(reducer, initialState)
+    const [{questions, status, index, answer, points, highScore}, dispatch] = useReducer(reducer, initialState)
 
     const numQuestions = questions.length;
+    const maxPoints = questions.reduce((prev, curr)=>prev+curr.points, 0)
     useEffect(() => {
             fetch('http://localhost:8000/questions')
             .then((res)=>res.json())
@@ -63,11 +82,13 @@ export default function App() {
                 {status==='loading' && <Loader/>}
                 {status==='ready' && <StartScreen numQuestions ={numQuestions} dispatch={dispatch}/>}
                 {status==='error' && <Error/>}
-                {status==='active' && <Question 
-                question={questions[index]} dispatch={dispatch} answer={answer}/>}
+                {status==='active' && 
+                <>
+                <Progress index={index} numQuestions={numQuestions} points={points} maxPoints={maxPoints} answer={answer}/>
+                <Question question={questions[index]} dispatch={dispatch} answer={answer} /><NextButton dispatch={dispatch} answer={answer} /></>
+                }
 
-                {/* <p>1/15</p>
-                <p>Question</p> */}
+                {status==='finished' && <p><FinishedScreen points={points} maxPoints={maxPoints} highScore={highScore}/></p>}
                 </Main>
         {/* <div><DateCounter/></div> */}
         {/* <div><Counter/></div> */}
