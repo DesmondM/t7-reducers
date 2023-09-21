@@ -1,8 +1,8 @@
 import React from 'react'
 
-const Footer = () => {
+const Footer = ({children}) => {
   return (
-    <div>Footer</div>
+    <footer>{children}</footer>
   )
 }
 

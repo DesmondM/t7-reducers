@@ -60,7 +60,7 @@ const reducer = (state, action) => {
         case 'finish':
             return {
                 ...state,
-                status: 'finished',
+                status: 'finish',
                 highScore: state.points > state.highScore ? state.points : state.highScore,
             }
 
@@ -116,12 +116,12 @@ export default function App() {
                         />
                         <Question question={questions[index]} dispatch={dispatch} answer={answer} />
                         <Footer>
-                            {/* <Timer dispatch={dispatch} secondsRemaining={secondsRemaining} /> */}
+                            <Timer dispatch={dispatch} secondsRemaining={secondsRemaining} />
                             <NextButton dispatch={dispatch} answer={answer} />
                         </Footer>
                     </>
                 );
-            case "finished":
+            case "finish":
                 return <FinishedScreen points={points} 
                 maxPoints={maxPoints} 
                 highScore={highScore} 
